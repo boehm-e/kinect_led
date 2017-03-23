@@ -259,6 +259,19 @@ void depth_cb(freenect_device *dev, void *v_depth, uint32_t timestamp)
 	int i;
 	uint16_t *depth = (uint16_t*)v_depth;
 	pthread_mutex_lock(&gl_backbuf_mutex);
+
+
+	// MY CODE
+	for (i=320*(240/2); i<320*(240/2)+240; i++) {
+	  int pval = t_gamma[depth[i]];
+	  int lb = pval & 0xff;
+	  // printf("%d\n", lb);
+	  if (i%15 == 0) { // DISPLAY ONLY EVERY 20
+	    printf("PIXEL : [%d,120] : %d : %d\n", i-640*(480/2), lb, pval>>8);
+	  }
+	}
+
+
 	for (i=0; i<320*240; i++) {
 		int pval = t_gamma[depth[i]];
 		int lb = pval & 0xff;
@@ -309,8 +322,8 @@ void *freenect_threadfunc(void *arg)
 {
 	int accelCount = 0;
 
-	freenect_set_tilt_degs(f_dev,freenect_angle);
-	freenect_set_led(f_dev,LED_RED);
+	//freenect_set_tilt_degs(f_dev,freenect_angle);
+	//freenect_set_led(f_dev,LED_RED);
 	freenect_set_depth_callback(f_dev, depth_cb);
 	freenect_set_depth_mode(f_dev, freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT_PACKED));
 	freenect_set_depth_chunk_callback(f_dev,chunk_cb);
@@ -320,7 +333,7 @@ void *freenect_threadfunc(void *arg)
 
 	while (!die && freenect_process_events(f_ctx) >= 0) {
 		//Throttle the text output
-		if (accelCount++ >= 2000)
+		/*if (accelCount++ >= 2000)
 		{
 			accelCount = 0;
 			freenect_raw_tilt_state* state;
@@ -330,8 +343,8 @@ void *freenect_threadfunc(void *arg)
 			freenect_get_mks_accel(state, &dx, &dy, &dz);
 			printf("\r raw acceleration: %4d %4d %4d  mks acceleration: %4f %4f %4f", state->accelerometer_x, state->accelerometer_y, state->accelerometer_z, dx, dy, dz);
 			fflush(stdout);
-		}
-
+			}*/
+		
 	}
 
 	printf("\nshutting down streams...\n");
