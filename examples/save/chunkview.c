@@ -208,23 +208,23 @@ void ReSizeGLScene(int Width, int Height)
 
 void InitGL(int Width, int Height)
 {
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-  glClearDepth(1.0);
-  glDepthFunc(GL_LESS);
-  glDepthMask(GL_FALSE);
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
-  glDisable(GL_ALPHA_TEST);
-  glEnable(GL_TEXTURE_2D);
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glShadeModel(GL_FLAT);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0);
+	glDepthFunc(GL_LESS);
+    glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
+    glEnable(GL_TEXTURE_2D);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glShadeModel(GL_FLAT);
 
-  glGenTextures(1, &gl_depth_tex);
-  glBindTexture(GL_TEXTURE_2D, gl_depth_tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenTextures(1, &gl_depth_tex);
+	glBindTexture(GL_TEXTURE_2D, gl_depth_tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  ReSizeGLScene(Width, Height);
+	ReSizeGLScene(Width, Height);
 }
 
 void *gl_threadfunc(void *arg)

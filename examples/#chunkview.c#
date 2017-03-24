@@ -100,7 +100,42 @@ void chunk_cb(void *buffer, void *pkt_data, int pkt_num, int pkt_size,void *ud)
         frame[1] = ((raw[2]<<9)  | (raw[3]<<1) | (raw[4]>>7) ) & 2047;
         frame[2] = ((raw[5]<<7)  | (raw[6]>>1) )           & 2047;
         frame[3] = ((raw[8]<<5)  | (raw[9]>>3) )           & 2047;
-        frame[4] =  (raw[11]<<3)  | (raw[12]>>5);
+	void chunk_cb(void *buffer, void *pkt_data, int pkt_num, int pkt_size,void *ud)
+	{
+	  if(pkt_num == 73 || pkt_num == 146) return;
+	  uint8_t *raw = (uint8_t *) pkt_data;
+	  uint16_t *frame=(uint16_t *)buffer;
+	  if(pkt_num > 219){
+	    raw += (pkt_num-220) * 12;
+	    frame += 320 * (pkt_num-2);
+	  }else if(pkt_num > 146){
+	    raw += (pkt_num-147) * 12 + 4;
+	    frame += 320 * (pkt_num-2);
+	  }else if(pkt_num > 73){
+	    raw += (pkt_num-74) * 12 + 8;
+	    frame += 320 * (pkt_num-1);
+	  }else{
+	    raw += pkt_num * 12;
+	    frame += 320 * pkt_num;
+	  }
+
+	  int n = 0;
+	  while(n != 40){
+	    frame[0] =  (raw[0]<<3)  | (raw[1]>>5);
+	    frame[1] = ((raw[2]<<9)  | (raw[3]<<1) | (raw[4]>>7) ) & 2047;
+	    frame[2] = ((raw[5]<<7)  | (raw[6]>>1) )           & 2047;
+	    frame[3] = ((raw[8]<<5)  | (raw[9]>>3) )           & 2047;
+	    frame[4] =  (raw[11]<<3)  | (raw[12]>>5);
+	    frame[5] = ((raw[13]<<9)  | (raw[14]<<1) | (raw[15]>>7) ) & 2047;
+	    frame[6] = ((raw[16]<<7)  | (raw[17]>>1) )           & 2047;
+	    frame[7] = ((raw[19]<<5)  | (raw[20]>>3) )           & 2047;
+	    frame+=8;
+	    raw+=22;
+	    n++;
+	  }
+
+	}
+	frame[4] =  (raw[11]<<3)  | (raw[12]>>5);
         frame[5] = ((raw[13]<<9)  | (raw[14]<<1) | (raw[15]>>7) ) & 2047;
         frame[6] = ((raw[16]<<7)  | (raw[17]>>1) )           & 2047;
         frame[7] = ((raw[19]<<5)  | (raw[20]>>3) )           & 2047;
@@ -208,23 +243,23 @@ void ReSizeGLScene(int Width, int Height)
 
 void InitGL(int Width, int Height)
 {
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-  glClearDepth(1.0);
-  glDepthFunc(GL_LESS);
-  glDepthMask(GL_FALSE);
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
-  glDisable(GL_ALPHA_TEST);
-  glEnable(GL_TEXTURE_2D);
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glShadeModel(GL_FLAT);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0);
+	glDepthFunc(GL_LESS);
+    glDepthMask(GL_FALSE);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
+    glEnable(GL_TEXTURE_2D);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glShadeModel(GL_FLAT);
 
-  glGenTextures(1, &gl_depth_tex);
-  glBindTexture(GL_TEXTURE_2D, gl_depth_tex);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenTextures(1, &gl_depth_tex);
+	glBindTexture(GL_TEXTURE_2D, gl_depth_tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  ReSizeGLScene(Width, Height);
+	ReSizeGLScene(Width, Height);
 }
 
 void *gl_threadfunc(void *arg)
@@ -392,7 +427,7 @@ int main(int argc, char **argv)
 	if (argc > 1)
 		user_device_number = atoi(argv[1]);
 
-	if (nr_devices < 1) {
+	if(nr_devices < 1) {
 		freenect_shutdown(f_ctx);
 		return 1;
 	}
